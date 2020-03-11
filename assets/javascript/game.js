@@ -1,4 +1,4 @@
- // Your web app's Firebase configuration
+ // Firebase configuration
  var firebaseConfig = {
     apiKey: "AIzaSyC7TtrAdMjN6XBW-TQPLcqKU5ZAAxLiJz0",
     authDomain: "rps-multi-95941.firebaseapp.com",
@@ -26,7 +26,8 @@ var playerTwo = {
 
 var pOneMove = false;
 var pTwoMove = false;
-var numGames = 0;
+var gameStarted = true;
+var numGames = 1;
 var numTies = 0;
 var recentMove = "";
 var results = "";
@@ -35,7 +36,7 @@ var recentGame = {
     playerOneMove: playerOne.recentPlay,
     playerTwoMove: playerTwo.recentPlay,
     gameResults: results
-}
+};
 
 $(document).keyup(function (event) {
     recentMove = event.key;
@@ -50,9 +51,10 @@ $(document).keyup(function (event) {
             console.log(playerTwo.recentPlay);
             pTwoMove = true;
             determineResults();
+            gameStarted = false;
         }
     }
-    else {
+    else if (gameStarted) {
         console.log("please press the letter 'r' for rock, 'p' for paper, or 's' for scissors!");
     }
 });
@@ -73,16 +75,31 @@ function determineResults () {
         results = "player two wins";
         playerTwo.numWins++;
     }
-    numGames++;
-    console.log(numGames, numTies, playerOne.numWins, playerTwo.numWins);
-    pOneMove = false;
-    pTwoMove = false;
 
+    roundOver();
+}
+
+function roundOver () {
+    console.log(results);
+    // fills in object that holds recent game data
     recentGame = {
         playerOneMove: playerOne.recentPlay,
         playerTwoMove: playerTwo.recentPlay,
         gameResults: results
     }
 
+    // uploads most recent game to firebase
     database.ref().push(recentGame);
+}
+
+$("#newRound").on("click", function() {
+    newRound();
+})
+
+function newRound (){
+    gameStarted = true;
+    numGames++;
+    console.log(numGames);
+    pOneMove = false;
+    pTwoMove = false;
 }
