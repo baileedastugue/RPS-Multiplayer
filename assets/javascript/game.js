@@ -35,8 +35,12 @@ var results = "";
 var recentGame = {
     playerOneMove: playerOne.recentPlay,
     playerTwoMove: playerTwo.recentPlay,
-    gameResults: results
+    gameResults: results,
+    playerOneWins: playerOne.numWins,
+    playerTwoWins: playerTwo.numWins,
 };
+
+$("#newRound").hide();
 
 $(document).keyup(function (event) {
     recentMove = event.key;
@@ -75,7 +79,6 @@ function determineResults () {
         results = "player two wins";
         playerTwo.numWins++;
     }
-
     roundOver();
 }
 
@@ -85,15 +88,20 @@ function roundOver () {
     recentGame = {
         playerOneMove: playerOne.recentPlay,
         playerTwoMove: playerTwo.recentPlay,
-        gameResults: results
+        gameResults: results,
+        playerOneWins: playerOne.numWins,
+        playerTwoWins: playerTwo.numWins
     }
 
     // uploads most recent game to firebase
     database.ref().push(recentGame);
+    gameStarted = false;
+    displayResults();
 }
 
 $("#newRound").on("click", function() {
     newRound();
+    $("#newRound").hide();
 })
 
 function newRound (){
@@ -102,4 +110,8 @@ function newRound (){
     console.log(numGames);
     pOneMove = false;
     pTwoMove = false;
+}
+
+function displayResults () {
+    $("#newRound").show();   
 }
