@@ -144,6 +144,7 @@ function clearHist () {
 function newRound (){
     $("#p1Play").empty();
     $("#p2Play").empty();
+    $("#player2, #player1").attr("move", "empty");
     $("#p1Play").text("Choose your move");
     gameStarted = true;
     pOneMove = false;
@@ -171,10 +172,35 @@ database.ref().on("child_added", function(childSnapshot) {
 
     $("#p1Play").text(p1move);
     $("#p2Play").text(p2move);
+
+    changeImage();
 })
 
 function displayResults () {    
     $("#newRound").show(); 
-    $("#clearHistory").show();   
+    $("#clearHistory").show();
 }
 
+function changeImage() {
+    if (playerOne.recentPlay === "r") {
+        $("#player1").attr("move", "rock");
+        console.log($("img"));
+    }
+    if (playerTwo.recentPlay === "r") {
+        $("#player2").attr("move", "rock");
+    }
+    if (playerOne.recentPlay === "p") {
+        $("#player1").attr("move", "paper");
+        console.log($("img"));
+    }
+    if (playerTwo.recentPlay === "p") {
+        $("#player2").attr("move", "paper");
+    }
+    if (playerOne.recentPlay === "s") {
+        $("#player1").attr("move", "scissors");
+        console.log($("img"));
+    }
+    if (playerTwo.recentPlay === "s") {
+        $("#player2").attr("move", "scissors");
+    }
+}

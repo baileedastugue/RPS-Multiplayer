@@ -1,3 +1,29 @@
 #wrapper {
     height: 100%;   
 }
+
+.player[move="rock"] {
+    content: url("../images/rock.png");
+}
+
+.player[move="paper"] {
+    content: url("../images/paper.png");
+}
+
+.player[move="scissors"] {
+    content: url("../images/scissors.png");
+}
+
+.player[move="empty"] {
+    content: none;
+}
+
+#player2 {
+    -webkit-transform: scaleX(-1);
+    transform: scaleX(-1);
+}
+
+img.player {
+    width: 100%;
+    display: block  ;
+}
