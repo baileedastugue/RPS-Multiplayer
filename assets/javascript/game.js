@@ -130,6 +130,7 @@ $("#clearHistory").on("click", function() {
 
 function clearHist () {
     database.ref().remove();
+    $("#player2, #player1").attr("move", "empty");
     $("tbody").empty();
     $("#p1Play").empty();
     $("#p2Play").empty();
