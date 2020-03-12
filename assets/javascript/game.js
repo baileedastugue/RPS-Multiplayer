@@ -27,7 +27,7 @@ var playerTwo = {
 var pOneMove = false;
 var pTwoMove = false;
 var gameStarted = true;
-var numGames = 1;
+var numRounds = 1;
 var numTies = 0;
 var recentMove = "";
 var results = "";
@@ -38,21 +38,21 @@ var recentGame = {
     gameResults: results,
     playerOneWins: playerOne.numWins,
     playerTwoWins: playerTwo.numWins,
+    numberRounds: numRounds
 };
 
 $("#newRound").hide();
+$("#clearHistory").hide();
 
 $(document).keyup(function (event) {
     recentMove = event.key;
     if (recentMove === "r" || recentMove === "p" || recentMove === "s") {
         if (!pOneMove) {
             playerOne.recentPlay = recentMove;
-            console.log(playerOne.recentPlay);
             pOneMove = true;
         }
         else if (!pTwoMove) {
             playerTwo.recentPlay = recentMove;
-            console.log(playerTwo.recentPlay);
             pTwoMove = true;
             determineResults();
             gameStarted = false;
@@ -65,7 +65,7 @@ $(document).keyup(function (event) {
 
 
 function determineResults () {
-    if (playerOne.recentPlay === "r" && playerTwo.recentPlay === "p" ||
+    if (playerOne.recentPlay === "r" && playerTwo.recentPlay === "s" ||
         playerOne.recentPlay === "p" && playerTwo.recentPlay === "r" || 
         playerOne.recentPlay === "s" && playerTwo.recentPlay === "p") {
             results = "player one wins";
@@ -83,14 +83,15 @@ function determineResults () {
 }
 
 function roundOver () {
-    console.log(results);
+    numRounds++;
     // fills in object that holds recent game data
     recentGame = {
         playerOneMove: playerOne.recentPlay,
         playerTwoMove: playerTwo.recentPlay,
         gameResults: results,
         playerOneWins: playerOne.numWins,
-        playerTwoWins: playerTwo.numWins
+        playerTwoWins: playerTwo.numWins,
+        numberRounds: numRounds
     }
 
     // uploads most recent game to firebase
@@ -103,6 +104,7 @@ function roundOver () {
 $("#newRound").on("click", function() {
     newRound();
     $("#newRound").hide();
+    $("#clearHistory").hide();
 })
 
 $("#clearHistory").on("click", function() {
@@ -111,21 +113,39 @@ $("#clearHistory").on("click", function() {
 
 function clearHist () {
     database.ref().remove();
+    $("tbody").empty();
+    numRounds = 0;
+    numTies = 0;
 }
 
 function newRound (){
     gameStarted = true;
-    numGames++;
-    console.log(numGames);
     pOneMove = false;
     pTwoMove = false;
 }
 
 database.ref().on("child_added", function(childSnapshot) {
-    console.log(childSnapshot.val());
+    var gameRes = childSnapshot.val().gameResults;
+    var p1move = childSnapshot.val().playerOneMove;
+    var p1wins = childSnapshot.val().playerOneWins;
+    var p2move = childSnapshot.val().playerTwoMove;
+    var p2wins = childSnapshot.val().playerTwoWins;
+    var roundNumber = childSnapshot.val().numberRounds;
+
+    var newRow = $("<tr>").append (
+        $("<td>").text(roundNumber),
+        $("<td>").text(p1move),
+        $("<td>").text(p2move),
+        $("<td>").text(gameRes),
+        $("<td>").text(p1wins),
+        $("<td>").text(p2wins),
+    );
+
+    $("tbody").append(newRow);
 })
 
 function displayResults () {    
-    $("#newRound").show();   
+    $("#newRound").show(); 
+    $("#clearHistory").show();   
 }
 
