@@ -16,12 +16,14 @@ var database = firebase.database();
 
 var playerOne = {
     recentPlay: "",
-    numWins: 0
+    numWins: 0,
+    moveArray: []
 }
 
 var playerTwo = {
     recentPlay: "",
-    numWins: 0
+    numWins: 0,
+    moveArray: []
 }
 
 var pOneMove = false;
@@ -46,6 +48,7 @@ $(document).ready(function () {
     $("#newRound").hide();
     $("#clearHistory").hide();
     clearHist();
+    $("#p1Play").text("Choose your move");
 })
 
 $(document).keyup(function (event) {
@@ -53,11 +56,19 @@ $(document).keyup(function (event) {
     if (recentMove === "r" || recentMove === "p" || recentMove === "s") {
         if (!pOneMove) {
             playerOne.recentPlay = recentMove;
+            playerOne.moveArray.push(recentMove);
+            // console.log(playerOne.modeArray);
+            console.log(math.mode(playerOne.moveArray));
+            $("#p1Play").empty();
+            $("#p2Play").text("Choose your move");
             pOneMove = true;
         }
         else if (!pTwoMove) {
             playerTwo.recentPlay = recentMove;
             pTwoMove = true;
+            playerTwo.moveArray.push(recentMove);
+            // console.log(playerTwo.modeArray);
+            console.log(math.mode(playerTwo.moveArray));
             determineResults();
             gameStarted = false;
         }
@@ -114,18 +125,26 @@ $("#newRound").on("click", function() {
 
 $("#clearHistory").on("click", function() {
     clearHist();
+    $("#clearHistory").hide();
 })
 
 function clearHist () {
     database.ref().remove();
     $("tbody").empty();
+    $("#p1Play").empty();
+    $("#p2Play").empty();
     numRounds = 0;
     numTies = 0;
     playerOne.numWins = 0;
     playerTwo.numWins = 0
+    playerOne.moveArray = [];
+    playerTwo.moveArray = [];
 }
 
 function newRound (){
+    $("#p1Play").empty();
+    $("#p2Play").empty();
+    $("#p1Play").text("Choose your move");
     gameStarted = true;
     pOneMove = false;
     pTwoMove = false;
@@ -142,8 +161,6 @@ database.ref().on("child_added", function(childSnapshot) {
 
     var newRow = $("<tr>").append (
         $("<td>").text(roundNumber),
-        $("<td>").text(p1move),
-        $("<td>").text(p2move),
         $("<td>").text(gameRes),
         $("<td>").text(p1wins),
         $("<td>").text(p2wins),
@@ -151,6 +168,9 @@ database.ref().on("child_added", function(childSnapshot) {
     );
 
     $("tbody").append(newRow);
+
+    $("#p1Play").text(p1move);
+    $("#p2Play").text(p2move);
 })
 
 function displayResults () {    

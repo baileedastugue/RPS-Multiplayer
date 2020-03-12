@@ -13,6 +13,9 @@
     <script src="https://www.gstatic.com/firebasejs/7.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.10.0/firebase-database.js"></script>
 
+    <!-- math.js reference -->
+    <script src=https://cdnjs.cloudflare.com/ajax/libs/mathjs/3.3.0/math.min.js></script>
+
     <!-- Stylesheet references -->
     <link rel="stylesheet" type="text/css" href="assets/CSS/reset.css">
     <link rel="stylesheet" type="text/css" href="assets/CSS/base.css">
@@ -23,33 +26,51 @@
     <div class="container">
         <!-- holds the rules for the game, prompts basic functionality -->
         <div class="row">
-            <div class="col-12">
+            <div class="col-md-12">
                 <p>This holds game play information</p>
             </div>
         </div>
     </div>
     <div class="container">
         <div class="row">
-            <div class="col-4"></div>
-            <div class="col-8">This will display who wins who dies who tells their story</div>
+            <div class="col-lg-4"></div>
+            <div class="col-lg-8">This will display who wins who dies who tells their story</div>
         </div>
     </div>
     <div class="container">
         <!-- holds whether p1 or p2 have picked R, P, S -->
         <div class="row">
-            <div class="col-6">
+            <div class="col-md-2">
                 <h2>Player 1</h2>
                 <span id="p1Play">Choose your move</span>
             </div>
-            <div class="col-6">
+
+            <div class="col-md-8" id="scoreboard">
+                <table class="table">
+                    <thead>
+                        <th scope="col">Round</th>
+                        <!-- <th scope="col">Player 1 Chose</th> -->
+                        <!-- <th scope="col">Player 2 Chose</th> -->
+                        <th scope="col">Results</th>
+                        <th scope="col">Player 1 Wins</th>
+                        <th scope="col">Player 2 Wins</th>
+                        <th scope="col">Ties</th>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="col-md-2">
                <h2>Player 2</h2>
-                <span id="p2Play">Choose your move</span>
+                <span id="p2Play"></span>
             </div>
         </div>
     </div>
     <div class="container">
-        <div class="row">
-            <div class="col-12" id="scoreboard">
+        <!-- <div class="row"> -->
+            <!-- <div class="col-12" id="scoreboard">
                 <table class="table">
                     <thead>
                         <th scope="col">Round</th>
@@ -64,8 +85,8 @@
 
                     </tbody>
                 </table>
-            </div>
-        </div>
+            </div> -->
+        <!-- </div> -->
         <div class="row">
             <div class="col-12" id="btnHolder">
                 <button class="btn" id="newRound">New Round</button>
