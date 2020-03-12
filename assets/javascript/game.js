@@ -95,6 +95,7 @@ function roundOver () {
 
     // uploads most recent game to firebase
     database.ref().push(recentGame);
+    
     gameStarted = false;
     displayResults();
 }
@@ -104,6 +105,14 @@ $("#newRound").on("click", function() {
     $("#newRound").hide();
 })
 
+$("#clearHistory").on("click", function() {
+    clearHist();
+})
+
+function clearHist () {
+    database.ref().remove();
+}
+
 function newRound (){
     gameStarted = true;
     numGames++;
@@ -112,6 +121,11 @@ function newRound (){
     pTwoMove = false;
 }
 
-function displayResults () {
+database.ref().on("child_added", function(childSnapshot) {
+    console.log(childSnapshot.val());
+})
+
+function displayResults () {    
     $("#newRound").show();   
 }
+
