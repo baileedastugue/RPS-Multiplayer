@@ -38,11 +38,15 @@ var recentGame = {
     gameResults: results,
     playerOneWins: playerOne.numWins,
     playerTwoWins: playerTwo.numWins,
-    numberRounds: numRounds
+    numberRounds: numRounds,
+    numberTies: numTies
 };
 
-$("#newRound").hide();
-$("#clearHistory").hide();
+$(document).ready(function () {
+    $("#newRound").hide();
+    $("#clearHistory").hide();
+    clearHist();
+})
 
 $(document).keyup(function (event) {
     recentMove = event.key;
@@ -91,7 +95,8 @@ function roundOver () {
         gameResults: results,
         playerOneWins: playerOne.numWins,
         playerTwoWins: playerTwo.numWins,
-        numberRounds: numRounds
+        numberRounds: numRounds,
+        numberTies: numTies
     }
 
     // uploads most recent game to firebase
@@ -116,6 +121,8 @@ function clearHist () {
     $("tbody").empty();
     numRounds = 0;
     numTies = 0;
+    playerOne.numWins = 0;
+    playerTwo.numWins = 0
 }
 
 function newRound (){
@@ -131,6 +138,7 @@ database.ref().on("child_added", function(childSnapshot) {
     var p2move = childSnapshot.val().playerTwoMove;
     var p2wins = childSnapshot.val().playerTwoWins;
     var roundNumber = childSnapshot.val().numberRounds;
+    var tieNumber = childSnapshot.val().numberTies;
 
     var newRow = $("<tr>").append (
         $("<td>").text(roundNumber),
@@ -139,6 +147,7 @@ database.ref().on("child_added", function(childSnapshot) {
         $("<td>").text(gameRes),
         $("<td>").text(p1wins),
         $("<td>").text(p2wins),
+        $("<td>").text(tieNumber)
     );
 
     $("tbody").append(newRow);
