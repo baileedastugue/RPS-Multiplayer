@@ -45,12 +45,14 @@ var recentGame = {
 };
 
 $(document).ready(function () {
-    $("#newRound").hide();
-    $("#clearHistory").hide();
-    // clearHist();
-    $("#p1Play").text("Choose your move");
-    $("#p1Container").css({"border": "10px solid red"});
+    $("#clearHistory, #newRound").hide();
+    setGame();
 })
+
+function setGame () {
+    $("#p1Play").text("Choose your move");
+    $("#p1Container").css({"border": "10px solid #65BA98"});
+}
 
 $(document).keyup(function (event) {
     recentMove = event.key;
@@ -61,7 +63,7 @@ $(document).keyup(function (event) {
             console.log(math.mode(playerOne.moveArray));
             $("#p1Play").empty();
             $("#p1Container").css({"border": "none"});
-            $("#p2Container").css({"border": "10px solid red"});
+            $("#p2Container").css({"border": "10px solid #65BA98"});
             $("#p2Play").text("Choose your move");
             pOneMove = true;
         }
@@ -129,6 +131,17 @@ $("#newRound").on("click", function() {
 $("#clearHistory").on("click", function() {
     clearHist();
     $("#clearHistory").hide();
+})
+
+$("#newGame").on("click", function() {
+    clearHist();
+    $("#newGame, #contGame").hide();
+    setGame();
+})
+
+$("#contGame").on("click", function() {
+    $("#newGame, #contGame").hide();
+    setGame();
 })
 
 function clearHist () {
