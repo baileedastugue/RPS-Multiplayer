@@ -47,8 +47,9 @@ var recentGame = {
 $(document).ready(function () {
     $("#newRound").hide();
     $("#clearHistory").hide();
-    clearHist();
+    // clearHist();
     $("#p1Play").text("Choose your move");
+    $("#p1Container").css({"border": "10px solid red"});
 })
 
 $(document).keyup(function (event) {
@@ -57,13 +58,15 @@ $(document).keyup(function (event) {
         if (!pOneMove) {
             playerOne.recentPlay = recentMove;
             playerOne.moveArray.push(recentMove);
-            // console.log(playerOne.modeArray);
             console.log(math.mode(playerOne.moveArray));
             $("#p1Play").empty();
+            $("#p1Container").css({"border": "none"});
+            $("#p2Container").css({"border": "10px solid red"});
             $("#p2Play").text("Choose your move");
             pOneMove = true;
         }
         else if (!pTwoMove) {
+            $("#p2Container").css({"border": "none"});
             playerTwo.recentPlay = recentMove;
             pTwoMove = true;
             playerTwo.moveArray.push(recentMove);
@@ -169,7 +172,7 @@ database.ref().on("child_added", function(childSnapshot) {
         $("<td>").text(tieNumber)
     );
 
-    $("tbody").append(newRow);
+    $("tbody").prepend(newRow);
 
     $("#p1Play").text(p1move);
     $("#p2Play").text(p2move);

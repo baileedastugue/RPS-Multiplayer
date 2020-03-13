@@ -1,5 +1,10 @@
+table {
+    overflow: auto;
+}
+
 #wrapper {
     height: 100%;   
+    position: relative;
 }
 
 .player[move="rock"] {
@@ -28,7 +33,45 @@ img.player {
     display: block  ;
 }
 
-/* .navbar-brand {
-    height: 70px;
-    /* padding: 0px; */
-/* } */
+#scoreboard {
+    height: 400px;
+    overflow-x: scroll;
+}
+
+a, p, table, span, h1, h2, h3, h4, div {
+    font-family: 'Roboto Mono', monospace;
+}
+
+#bottomRPS {
+    position: absolute;
+    bottom: 0vw;
+    width: 100%;
+    z-index: -5;
+    flex-shrink: 0;
+}
+
+#RPS1 {
+    position: absolute;
+    right: 1vw;
+    top: 10vw;
+    z-index: -1;
+}
+
+#RPS2 {
+    position: absolute;
+    left: 8vw;
+    top: 22vw;
+    z-index: -1;
+}
+
+#RPS4 {
+    position: absolute;
+    right: 23vw;
+    bottom: 12vw;
+    z-index: -1;
+}
+
+#gameContainer {
+    background: white;
+    opacity: 80%    
+}
