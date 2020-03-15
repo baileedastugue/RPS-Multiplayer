@@ -28,35 +28,42 @@ var playerTwo = {
 
 var pOneMove = false;
 var pTwoMove = false;
-var gameStarted = true;
+var gameStarted = false;
 var numRounds = 1;
 var numTies = 0;
 var recentMove = "";
 var results = "";
 
-var recentGame = {
-    playerOneMove: playerOne.recentPlay,
-    playerTwoMove: playerTwo.recentPlay,
-    gameResults: results,
-    playerOneWins: playerOne.numWins,
-    playerTwoWins: playerTwo.numWins,
-    numberRounds: numRounds,
-    numberTies: numTies
-};
+var recentGame;
 
 $(document).ready(function () {
     $("#clearHistory, #newRound").hide();
     setGame();
+    database.ref().on("child_added", function(childSnapshot) {
+        var roundNumber = childSnapshot.val().numberRounds;
+        var gameRes = childSnapshot.val().gameResults;
+        var p1wins = childSnapshot.val().playerOneWins;
+        var p2wins = childSnapshot.val().playerTwoWins;
+        var roundNumber = childSnapshot.val().numberRounds;
+        var tieNumber = childSnapshot.val().numberTies;
+        numRounds = roundNumber;
+        numTies = tieNumber;
+        results = gameRes;
+        playerOne.numWins = p1wins;
+        playerTwo.numWins = p2wins;
+    })
 })
 
 function setGame () {
-    $("#p1Play").text("Choose your move");
-    $("#p1Container").css({"border": "10px solid #65BA98"});
+    if (gameStarted) {
+        $("#p1Play").text("Choose your move");
+        $("#p1Container").css({"border": "10px solid #65BA98"});
+    }
 }
 
 $(document).keyup(function (event) {
     recentMove = event.key;
-    if (recentMove === "r" || recentMove === "p" || recentMove === "s") {
+    if (recentMove === "r" || recentMove === "p" || recentMove === "s" && gameStarted) {
         if (!pOneMove) {
             playerOne.recentPlay = recentMove;
             playerOne.moveArray.push(recentMove);
@@ -134,12 +141,14 @@ $("#clearHistory").on("click", function() {
 })
 
 $("#newGame").on("click", function() {
+    gameStarted = true;
     clearHist();
     $("#newGame, #contGame").hide();
     setGame();
 })
 
 $("#contGame").on("click", function() {
+    gameStarted = true;
     $("#newGame, #contGame").hide();
     setGame();
 })
@@ -170,9 +179,9 @@ function newRound (){
 
 database.ref().on("child_added", function(childSnapshot) {
     var gameRes = childSnapshot.val().gameResults;
-    var p1move = childSnapshot.val().playerOneMove;
+    // var p1move = childSnapshot.val().playerOneMove;
     var p1wins = childSnapshot.val().playerOneWins;
-    var p2move = childSnapshot.val().playerTwoMove;
+    // var p2move = childSnapshot.val().playerTwoMove;
     var p2wins = childSnapshot.val().playerTwoWins;
     var roundNumber = childSnapshot.val().numberRounds;
     var tieNumber = childSnapshot.val().numberTies;
@@ -187,8 +196,8 @@ database.ref().on("child_added", function(childSnapshot) {
 
     $("tbody").prepend(newRow);
 
-    $("#p1Play").text(p1move);
-    $("#p2Play").text(p2move);
+    // $("#p1Play").text(p1move);
+    // $("#p2Play").text(p2move);
 
     changeImage();
 })

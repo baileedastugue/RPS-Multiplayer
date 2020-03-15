@@ -75,3 +75,11 @@ a, p, table, span, h1, h2, h3, h4, div {
     background: white;
     opacity: 80%    
 }
+
+button {
+    background-color: #65BA98;
+}
+
+button:hover {
+    background-color: gray;
+}
