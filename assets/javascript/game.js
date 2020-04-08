@@ -17,8 +17,7 @@ var database = firebase.database();
 var playerOne = {
     recentPlay: "",
     numWins: 0,
-    moveArray: [],
-    taunts: ["You look like a blueberry", "Your mother was a hamster and your father smelt of elderberries", "You are a sad, strange little man, and you have my pity.", "You like Coldplay"]
+    moveArray: []
 }
 
 var playerTwo = {
@@ -26,7 +25,7 @@ var playerTwo = {
     numWins: 0,
     moveArray: []
 }
-var lastTurn = "p2";
+
 var pOneMove = false;
 var pTwoMove = false;
 var gameStarted = false;
@@ -38,8 +37,8 @@ var results = "";
 var recentGame;
 
 $(document).ready(function () {
-    // $("#clearHistory, #newRound").hide();
-    // setGame();
+    $("#clearHistory, #newRound").hide();
+    setGame();
     database.ref().on("child_added", function(childSnapshot) {
         var roundNumber = childSnapshot.val().numberRounds;
         var gameRes = childSnapshot.val().gameResults;
@@ -47,8 +46,6 @@ $(document).ready(function () {
         var p2wins = childSnapshot.val().playerTwoWins;
         var roundNumber = childSnapshot.val().numberRounds;
         var tieNumber = childSnapshot.val().numberTies;
-        var currentTurn = childSnapshot.val().whoseTurn;
-        lastTurn = currentTurn;
         numRounds = roundNumber;
         numTies = tieNumber;
         results = gameRes;
@@ -67,7 +64,7 @@ function setGame () {
 $(document).keyup(function (event) {
     recentMove = event.key;
     if (recentMove === "r" || recentMove === "p" || recentMove === "s" && gameStarted) {
-        if (lastTurn === "p2") {
+        if (!pOneMove) {
             playerOne.recentPlay = recentMove;
             playerOne.moveArray.push(recentMove);
             console.log(math.mode(playerOne.moveArray));
@@ -77,7 +74,7 @@ $(document).keyup(function (event) {
             $("#p2Play").text("Choose your move");
             pOneMove = true;
         }
-        else if (lastTurn === "p2") {
+        else if (!pTwoMove) {
             $("#p2Container").css({"border": "none"});
             playerTwo.recentPlay = recentMove;
             pTwoMove = true;
@@ -112,15 +109,6 @@ function determineResults () {
     roundOver();
 }
 
-function eachPlay () {
-    recentGame = {
-        playerOneMove: playerOne.recentPlay,
-        playerTwoMove: playerTwo.recentPlay,
-        whoseTurn: lastTurn
-    }
-    
-}
-
 function roundOver () {
     numRounds++;
     // fills in object that holds recent game data
@@ -131,8 +119,7 @@ function roundOver () {
         playerOneWins: playerOne.numWins,
         playerTwoWins: playerTwo.numWins,
         numberRounds: numRounds,
-        numberTies: numTies,
-        whoseTurn: lastTurn
+        numberTies: numTies
     }
 
     // uploads most recent game to firebase
