@@ -18,14 +18,14 @@ var playerOne = {
     name: "",
     recentPlay: "",
     numWins: 0,
-    moveArray: []
+    turn: true
 }
 
 var playerTwo = {
     name: "",
     recentPlay: "",
     numWins: 0,
-    moveArray: []
+    turn: false
 }
 
 var results = {
@@ -34,18 +34,12 @@ var results = {
     announce: "",
 }
 
-var whoseTurn = {
-    playerOnes: false,
-    playerTwos: false,
-    nextRound: false
-}
 
 var currentPlayerName = "";
 
 database.ref().child("/players/playerOne").set(playerOne);
 database.ref().child("/players/playerTwo").set(playerTwo);
 database.ref().child("/results/").set(results);
-database.ref().child("/whoseTurn/").set(whoseTurn);
 
 database.ref("/players/playerOne/recentPlay/").on("value", function(snapshot) {
     playerOne.recentPlay = snapshot.val();
@@ -53,6 +47,14 @@ database.ref("/players/playerOne/recentPlay/").on("value", function(snapshot) {
 
 database.ref("/players/playerTwo/recentPlay/").on("value", function(snapshot) {
     playerTwo.recentPlay = snapshot.val();
+})
+
+database.ref("/players/playerOne/turn/").on("value", function(snapshot) {
+    playerOne.turn = snapshot.val();
+})
+
+database.ref("/players/playerTwo/turn/").on("value", function(snapshot) {
+    playerTwo.turn = snapshot.val();
 })
 
 database.ref("/players/playerOne/numWins/").on("value", function(snapshot) {
@@ -72,12 +74,15 @@ database.ref("/results/announce").on("value", function(snapshot) {
 $(document).keyup(function (event) {
     var recentMove = event.key;
     if (recentMove === "r" || recentMove === "p" || recentMove === "s") {
-        if (playerOne.recentPlay === "" && playerTwo.recentPlay === "") {
+        if (playerOne.turn === true) {
             database.ref().child("/players/playerOne/recentPlay").set(recentMove);
+            database.ref().child("/players/playerOne/turn").set(false);
+            database.ref().child("/players/playerTwo/turn").set(true);
             console.log("player1 " + playerOne.recentPlay)
         }
-        else if (playerTwo.recentPlay === "") {
+        else if (playerTwo.turn === true) {
             database.ref().child("/players/playerTwo/recentPlay").set(recentMove);
+            database.ref().child("/players/playerTwo/turn").set(false);
             console.log("player2 " + playerTwo.recentPlay)
             determineResults();
         }
@@ -116,6 +121,7 @@ function determineResults () {
 }
 
 function displayResults () {    
+    
     var newRow = $("<tr>").append (
         $("<td>").text(results.numRounds),
         $("<td>").text(results.announce),
@@ -128,6 +134,15 @@ function displayResults () {
 //     changeImage();
     $("#newRound").show(); 
     $("#clearHistory").show();
+}
+
+function newRound (){
+    $("#p1Play").empty();
+    $("#p2Play").empty();
+    $("#player2, #player1").attr("move", "empty");
+    $("#p1Play").text("Choose your move");
+    database.ref().child("/players/playerOne/turn").set(true);
+
 }
 
 $("#newRound").on("click", function() {
@@ -157,18 +172,6 @@ function clearHist () {
     // playerOne.numWins = 0;
     // playerTwo.numWins = 0
 }
-
-// function newRound (){
-//     $("#p1Play").empty();
-//     $("#p2Play").empty();
-//     $("#player2, #player1").attr("move", "empty");
-//     $("#p1Play").text("Choose your move");
-//     players = {
-//         pOnePlay: "",
-//         pTwoPlay: "",
-//     }
-//     database.ref().push(players);
-// }
 
 // function changeImage() {
 //     if (playerOne.recentPlay === "r") {
