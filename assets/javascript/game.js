@@ -55,6 +55,20 @@ database.ref("/players/playerTwo/recentPlay/").on("value", function(snapshot) {
     playerTwo.recentPlay = snapshot.val();
 })
 
+database.ref("/players/playerOne/numWins/").on("value", function(snapshot) {
+    playerOne.numWins = snapshot.val();
+})
+database.ref("/players/playerTwo/numWins/").on("value", function(snapshot) {
+    playerTwo.numWins = snapshot.val();
+})
+database.ref("/results/numTies").on("value", function(snapshot) {
+    results.numTies = snapshot.val();
+})
+database.ref("/results/announce").on("value", function(snapshot) {
+    results.announce = snapshot.val();
+})
+
+
 $(document).keyup(function (event) {
     var recentMove = event.key;
     if (recentMove === "r" || recentMove === "p" || recentMove === "s") {
@@ -98,20 +112,16 @@ function determineResults () {
         database.ref().child("/results/announce").set(outcome); 
         console.log("p2 wins");
     }
-}
-
-function roundOver () {
-    numRounds++;
     displayResults();
 }
 
 function displayResults () {    
     var newRow = $("<tr>").append (
-        $("<td>").text(numRounds),
-        $("<td>").text(results),
+        $("<td>").text(results.numRounds),
+        $("<td>").text(results.announce),
         $("<td>").text(playerOne.numWins),
         $("<td>").text(playerTwo.numWins),
-        $("<td>").text(numTies)
+        $("<td>").text(results.numTies)
     );
 
     $("tbody").prepend(newRow);
@@ -119,8 +129,6 @@ function displayResults () {
     $("#newRound").show(); 
     $("#clearHistory").show();
 }
-
-
 
 $("#newRound").on("click", function() {
     newRound();
