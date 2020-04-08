@@ -26,108 +26,87 @@ var playerTwo = {
     moveArray: []
 }
 
-var pOneMove = false;
-var pTwoMove = false;
-var gameStarted = false;
 var numRounds = 1;
 var numTies = 0;
-var recentMove = "";
 var results = "";
 
 var recentGame;
+var players;
+var newEntry;
 
-$(document).ready(function () {
-    $("#clearHistory, #newRound").hide();
-    setGame();
-    database.ref().on("child_added", function(childSnapshot) {
-        var roundNumber = childSnapshot.val().numberRounds;
-        var gameRes = childSnapshot.val().gameResults;
-        var p1wins = childSnapshot.val().playerOneWins;
-        var p2wins = childSnapshot.val().playerTwoWins;
-        var roundNumber = childSnapshot.val().numberRounds;
-        var tieNumber = childSnapshot.val().numberTies;
-        numRounds = roundNumber;
-        numTies = tieNumber;
-        results = gameRes;
-        playerOne.numWins = p1wins;
-        playerTwo.numWins = p2wins;
+// function pullData () {
+    database.ref().endAt().limitToLast(1).on("child_added", function(snapshot) {
+        newEntry = snapshot.val();
+        playerOne.recentPlay = newEntry.pOnePlay;
+        playerTwo.recentPlay = newEntry.pTwoPlay;
+        console.log("data has been pulled");
+
+        if (!playerOne.recentPlay == "" && !playerTwo.recentPlay == "") {
+            determineResults();
+            console.log("banana");
+            roundOver();
+        }
     })
-})
+// }
 
-function setGame () {
-    if (gameStarted) {
-        $("#p1Play").text("Choose your move");
-        $("#p1Container").css({"border": "10px solid #65BA98"});
-    }
-}
+// $(document).ready(function() {
+//     pullData();
+// })
 
 $(document).keyup(function (event) {
-    recentMove = event.key;
-    if (recentMove === "r" || recentMove === "p" || recentMove === "s" && gameStarted) {
-        if (!pOneMove) {
-            playerOne.recentPlay = recentMove;
-            playerOne.moveArray.push(recentMove);
-            console.log(math.mode(playerOne.moveArray));
-            $("#p1Play").empty();
-            $("#p1Container").css({"border": "none"});
-            $("#p2Container").css({"border": "10px solid #65BA98"});
-            $("#p2Play").text("Choose your move");
-            pOneMove = true;
+    var recentMove = event.key;
+    if (recentMove === "r" || recentMove === "p" || recentMove === "s") {
+        if (playerOne.recentPlay === "" && playerTwo.recentPlay === "") {
+            players = {
+                pOnePlay: recentMove,
+                pTwoPlay: ""
+            }
+            database.ref().push(players);
+            console.log("player1 " + playerOne.recentPlay)
         }
-        else if (!pTwoMove) {
-            $("#p2Container").css({"border": "none"});
-            playerTwo.recentPlay = recentMove;
-            pTwoMove = true;
-            playerTwo.moveArray.push(recentMove);
-            // console.log(playerTwo.modeArray);
-            console.log(math.mode(playerTwo.moveArray));
-            determineResults();
-            gameStarted = false;
+        else if (playerTwo.recentPlay === "") {
+            players = {
+                pOnePlay: playerOne.recentPlay,
+                pTwoPlay: recentMove,
+            }
+            database.ref().push(players);
+            console.log("player2 " + playerTwo.recentPlay)
         }
-    }
-    else if (gameStarted) {
-        console.log("please press the letter 'r' for rock, 'p' for paper, or 's' for scissors!");
     }
 });
 
-
+// determines whether there has been a tie or which player won
 function determineResults () {
+    // determines whether player one wins
     if (playerOne.recentPlay === "r" && playerTwo.recentPlay === "s" ||
         playerOne.recentPlay === "p" && playerTwo.recentPlay === "r" || 
         playerOne.recentPlay === "s" && playerTwo.recentPlay === "p") {
-            results = "player one wins";
+            // results = "player one wins";
+            console.log("p1 wins");
             playerOne.numWins++;
         }
+    // determines if there's a tie between player one and player two
     else if (playerOne.recentPlay === playerTwo.recentPlay) {
-        results = "tie";
+        // results = "tie";
+        console.log("tie");
         numTies++;
     }
+    // determines if player two wins
     else {
-        results = "player two wins";
+        console.log("p2 wins");
+        // results = "player two wins";
         playerTwo.numWins++;
     }
-    roundOver();
 }
 
 function roundOver () {
     numRounds++;
-    // fills in object that holds recent game data
-    recentGame = {
-        playerOneMove: playerOne.recentPlay,
-        playerTwoMove: playerTwo.recentPlay,
-        gameResults: results,
-        playerOneWins: playerOne.numWins,
-        playerTwoWins: playerTwo.numWins,
-        numberRounds: numRounds,
-        numberTies: numTies
-    }
-
-    // uploads most recent game to firebase
-    database.ref().push(recentGame);
+    // displayResults();
+    console.log(numRounds);
     
-    gameStarted = false;
-    displayResults();
 }
+
+
 
 $("#newRound").on("click", function() {
     newRound();
@@ -141,30 +120,20 @@ $("#clearHistory").on("click", function() {
 })
 
 $("#newGame").on("click", function() {
-    gameStarted = true;
     clearHist();
-    $("#newGame, #contGame").hide();
-    setGame();
 })
 
-$("#contGame").on("click", function() {
-    gameStarted = true;
-    $("#newGame, #contGame").hide();
-    setGame();
-})
 
 function clearHist () {
     database.ref().remove();
-    $("#player2, #player1").attr("move", "empty");
-    $("tbody").empty();
-    $("#p1Play").empty();
-    $("#p2Play").empty();
-    numRounds = 0;
-    numTies = 0;
-    playerOne.numWins = 0;
-    playerTwo.numWins = 0
-    playerOne.moveArray = [];
-    playerTwo.moveArray = [];
+    // $("#player2, #player1").attr("move", "empty");
+    // $("tbody").empty();
+    // $("#p1Play").empty();
+    // $("#p2Play").empty();
+    // numRounds = 0;
+    // numTies = 0;
+    // playerOne.numWins = 0;
+    // playerTwo.numWins = 0
 }
 
 function newRound (){
@@ -172,61 +141,68 @@ function newRound (){
     $("#p2Play").empty();
     $("#player2, #player1").attr("move", "empty");
     $("#p1Play").text("Choose your move");
-    gameStarted = true;
-    pOneMove = false;
-    pTwoMove = false;
+    players = {
+        pOnePlay: "",
+        pTwoPlay: "",
+    }
+    database.ref().push(players);
 }
 
-database.ref().on("child_added", function(childSnapshot) {
-    var gameRes = childSnapshot.val().gameResults;
-    // var p1move = childSnapshot.val().playerOneMove;
-    var p1wins = childSnapshot.val().playerOneWins;
-    // var p2move = childSnapshot.val().playerTwoMove;
-    var p2wins = childSnapshot.val().playerTwoWins;
-    var roundNumber = childSnapshot.val().numberRounds;
-    var tieNumber = childSnapshot.val().numberTies;
 
-    var newRow = $("<tr>").append (
-        $("<td>").text(roundNumber),
-        $("<td>").text(gameRes),
-        $("<td>").text(p1wins),
-        $("<td>").text(p2wins),
-        $("<td>").text(tieNumber)
-    );
+//     var newRow = $("<tr>").append (
+//         $("<td>").text(roundNumber),
+//         $("<td>").text(gameRes),
+//         $("<td>").text(p1wins),
+//         $("<td>").text(p2wins),
+//         $("<td>").text(tieNumber)
+//     );
 
-    $("tbody").prepend(newRow);
+//     $("tbody").prepend(newRow);
+//     changeImage();
 
-    // $("#p1Play").text(p1move);
-    // $("#p2Play").text(p2move);
+// function displayResults () {    
+//     $("#newRound").show(); 
+//     $("#clearHistory").show();
+// }
 
-    changeImage();
-})
+// function changeImage() {
+//     if (playerOne.recentPlay === "r") {
+//         $("#player1").attr("move", "rock");
+//         console.log($("img"));
+//     }
+//     if (playerTwo.recentPlay === "r") {
+//         $("#player2").attr("move", "rock");
+//     }
+//     if (playerOne.recentPlay === "p") {
+//         $("#player1").attr("move", "paper");
+//         console.log($("img"));
+//     }
+//     if (playerTwo.recentPlay === "p") {
+//         $("#player2").attr("move", "paper");
+//     }
+//     if (playerOne.recentPlay === "s") {
+//         $("#player1").attr("move", "scissors");
+//         console.log($("img"));
+//     }
+//     if (playerTwo.recentPlay === "s") {
+//         $("#player2").attr("move", "scissors");
+//     }
+// }
 
-function displayResults () {    
-    $("#newRound").show(); 
-    $("#clearHistory").show();
-}
+// changeBorders();
 
-function changeImage() {
-    if (playerOne.recentPlay === "r") {
-        $("#player1").attr("move", "rock");
-        console.log($("img"));
-    }
-    if (playerTwo.recentPlay === "r") {
-        $("#player2").attr("move", "rock");
-    }
-    if (playerOne.recentPlay === "p") {
-        $("#player1").attr("move", "paper");
-        console.log($("img"));
-    }
-    if (playerTwo.recentPlay === "p") {
-        $("#player2").attr("move", "paper");
-    }
-    if (playerOne.recentPlay === "s") {
-        $("#player1").attr("move", "scissors");
-        console.log($("img"));
-    }
-    if (playerTwo.recentPlay === "s") {
-        $("#player2").attr("move", "scissors");
-    }
-}
+// function changeBorders () {
+//     if (!pOneHasMoved && !pTwoHasMoved) {
+//         $("#p1Play").text("Choose your move");
+//         $("#p1Container").css({"border": "10px solid #65BA98"});
+//     }
+//     else if (pOneHasMoved && !pTwoHasMoved) {
+//         $("#p1Play").empty();
+//         $("#p1Container").css({"border": "none"});
+//         $("#p2Container").css({"border": "10px solid #65BA98"});
+//         $("#p2Play").text("Choose your move");
+//     }
+//     else if (pOneHasMoved && pTwoHasMoved) {
+//         $("#p2Container").css({"border": "none"});
+//     }
+// }
