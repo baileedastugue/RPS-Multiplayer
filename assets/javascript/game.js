@@ -38,6 +38,8 @@ var results = {
 
 
 var currentPlayerName = "";
+$("#btnHolder").hide();
+
 
 function gatherUsers (){
     $(document).on("click", "#name-btn", function () {
@@ -48,12 +50,16 @@ function gatherUsers (){
             database.ref("/players/playerOne/present").set(true);
             $("#p1name").html(playerOne.name);
             $("#nameForm")[0].reset();
+            $("#nameLabel").html("Waiting on Player 2 to join")
                 // "waiting on Player 2 to join!");
         }
         else if (!results.gameStarted){
             database.ref("/players/playerTwo/name").set(userName);
             database.ref("/players/playerTwo/present").set(true);
             $("#p2name").html(playerTwo.name);
+            $("#nameForm")[0].reset();
+            $("#formContainer").hide();
+            $("#btnHolder").show();
             database.ref("/results/gameStarted").set(true);
         }
     })
@@ -83,11 +89,9 @@ database.ref("/players/playerTwo/name/").on("value", function(snapshot) {
 })
 database.ref("/players/playerOne/present/").on("value", function(snapshot) {
     playerOne.present = snapshot.val();
-    console.log("p1 present");
 })
 database.ref("/players/playerTwo/present/").on("value", function(snapshot) {
     playerTwo.present = snapshot.val();
-    console.log("p2 present");
 })
 database.ref("/players/playerOne/turn/").on("value", function(snapshot) {
     playerOne.turn = snapshot.val();
@@ -111,26 +115,38 @@ database.ref("/results/gameStarted").on("value", function(snapshot) {
     results.gameStarted = snapshot.val();
 })
 
-gatherUsers();
 
-// storing user inputs and pushing them to the database
-$(document).keyup(function (event) {
-    var recentMove = event.key;
-    if (recentMove === "r" || recentMove === "p" || recentMove === "s") {
-        if (playerOne.turn === true) {
-            database.ref().child("/players/playerOne/recentPlay").set(recentMove);
-            database.ref().child("/players/playerOne/turn").set(false);
-            database.ref().child("/players/playerTwo/turn").set(true);
-            console.log("player1 " + playerOne.recentPlay)
+function playGame () {
+    gatherUsers();
+    console.log("alligator");
+
+    // storing user inputs and pushing them to the database
+    $(document).keyup(function (event) {
+        var recentMove = event.key;
+        if (recentMove === "r" || recentMove === "p" || recentMove === "s") {
+            if (playerOne.turn === true) {
+                database.ref().child("/players/playerOne/recentPlay").set(recentMove);
+                database.ref().child("/players/playerOne/turn").set(false);
+                database.ref().child("/players/playerTwo/turn").set(true);
+                
+                console.log("player1 " + playerOne.recentPlay)
+                $("#p1Play").empty();
+                $("#p1Container").css({"border": "none"});
+                $("#p2Container").css({"border": "10px solid #65BA98"});
+                $("#p2Play").text("Choose your move");
+            }
+            else if (playerTwo.turn === true) {
+                database.ref().child("/players/playerTwo/recentPlay").set(recentMove);
+                database.ref().child("/players/playerTwo/turn").set(false);
+                console.log("player2 " + playerTwo.recentPlay)
+                determineResults();
+            }
         }
-        else if (playerTwo.turn === true) {
-            database.ref().child("/players/playerTwo/recentPlay").set(recentMove);
-            database.ref().child("/players/playerTwo/turn").set(false);
-            console.log("player2 " + playerTwo.recentPlay)
-            determineResults();
-        }
-    }
-});
+    });
+}
+
+
+playGame();
 
 // determines whether there has been a tie or which player won
 function determineResults () {
@@ -165,6 +181,8 @@ function determineResults () {
 
 // adding results to the scoreboard
 function displayResults () {    
+    $("#p2Container").css({"border": "none"});
+    $("#p2Play").empty();
     var newRow = $("<tr>").append (
         $("<td>").text(results.numRounds),
         $("<td>").text(results.announce),
@@ -174,7 +192,7 @@ function displayResults () {
     );
 
     $("tbody").prepend(newRow);
-//     changeImage();
+    changeImage();
     $("#newRound").show(); 
     $("#clearHistory").show();
 }
@@ -184,14 +202,16 @@ function newRound (){
     $("#p2Play").empty();
     $("#player2, #player1").attr("move", "empty");
     $("#p1Play").text("Choose your move");
+    $("#p1Container").css({"border": "10px solid #65BA98"});
     database.ref().child("/players/playerOne/turn").set(true);
-
 }
 
 $("#newRound").on("click", function() {
-    newRound();
-    $("#newRound").hide();
-    $("#clearHistory").hide();
+    if (results.gameStarted) {
+        newRound();
+        $("#newRound").hide();
+        $("#clearHistory").hide();
+    }
 })
 
 $("#clearHistory").on("click", function() {
@@ -211,44 +231,24 @@ function clearHist () {
     // playerTwo.numWins = 0
 }
 
-// function changeImage() {
-//     if (playerOne.recentPlay === "r") {
-//         $("#player1").attr("move", "rock");
-//         console.log($("img"));
-//     }
-//     if (playerTwo.recentPlay === "r") {
-//         $("#player2").attr("move", "rock");
-//     }
-//     if (playerOne.recentPlay === "p") {
-//         $("#player1").attr("move", "paper");
-//         console.log($("img"));
-//     }
-//     if (playerTwo.recentPlay === "p") {
-//         $("#player2").attr("move", "paper");
-//     }
-//     if (playerOne.recentPlay === "s") {
-//         $("#player1").attr("move", "scissors");
-//         console.log($("img"));
-//     }
-//     if (playerTwo.recentPlay === "s") {
-//         $("#player2").attr("move", "scissors");
-//     }
-// }
-
-// changeBorders();
-
-// function changeBorders () {
-//     if (!pOneHasMoved && !pTwoHasMoved) {
-//         $("#p1Play").text("Choose your move");
-//         $("#p1Container").css({"border": "10px solid #65BA98"});
-//     }
-//     else if (pOneHasMoved && !pTwoHasMoved) {
-//         $("#p1Play").empty();
-//         $("#p1Container").css({"border": "none"});
-//         $("#p2Container").css({"border": "10px solid #65BA98"});
-//         $("#p2Play").text("Choose your move");
-//     }
-//     else if (pOneHasMoved && pTwoHasMoved) {
-//         $("#p2Container").css({"border": "none"});
-//     }
-// }
+function changeImage() {
+    if (playerOne.recentPlay === "r") {
+        $("#player1").attr("move", "rock");
+    }
+    if (playerTwo.recentPlay === "r") {
+        $("#player2").attr("move", "rock");
+    }
+    if (playerOne.recentPlay === "p") {
+        $("#player1").attr("move", "paper");
+        console.log($("img"));
+    }
+    if (playerTwo.recentPlay === "p") {
+        $("#player2").attr("move", "paper");
+    }
+    if (playerOne.recentPlay === "s") {
+        $("#player1").attr("move", "scissors");
+    }
+    if (playerTwo.recentPlay === "s") {
+        $("#player2").attr("move", "scissors");
+    }
+}

@@ -30,12 +30,12 @@
           ROCK PAPER SCISSORS
         </a>
     </nav>
-    <div class="container">
+    <div class="container" id="formContainer">
         <div class="row">
             <div class="col-12">
                 <form id="nameForm">
                     <div class="form-group">
-                        <label for="userName">Input Name</label>
+                        <label for="userName" id="nameLabel">Waiting for player one...</label>
                         <input type="text" class="form-control" id="userName">
                         <button type="submit" class="btn" id="name-btn">Submit</button>
                     </div>
@@ -48,15 +48,9 @@
         <!-- holds the rules for the game, prompts basic functionality -->
         <div class="row">
             <div class="col-md-12">
-                <p>To play, each player selects the letter 'r' for rock, 'p' for paper, or 's' for scissors. To refresh your memory: rock beats scissors, scissors beats paper, and paper beats rock. </p>
-            </div>
-        </div>
-    </div>
-    <div class="container" id="btnHolder">
-        <div class="row">
-            <div class="col-12" >
-                <button class="btn" id="newRound">New Round</button>
-                <button class="btn" id="clearHistory">Clear</button>
+                <p>To play, each player selects the letter 'r' for rock, 'p' for paper, or 's' for scissors. To refresh your memory: rock beats scissors, scissors beats paper, and paper beats rock.
+                    Press 'play' to start a new game    
+                </p>
             </div>
         </div>
     </div>
@@ -65,11 +59,12 @@
         <div class="row">
             <div class="col-md-2" id="p1Container">
                 <h2 id="p1name">Player 1</h2>
-                <span id="p1Play">Choose your move</span>
+                <span id="p1Play"></span>
                 <img id="player1" class="player">
             </div>
 
             <div class="col-md-8" id="scoreboard">
+                <h2 id="sbTitle">Scoreboard</h2>
                 <table class="table">
                     <thead>
                         <th scope="col">Round</th>
@@ -79,15 +74,30 @@
                         <th scope="col">Ties</th>
                     </thead>
                     <tbody>
-
                     </tbody>
                 </table>
+                
             </div>
 
             <div class="col-md-2" id="p2Container">
                <h2 id="p2name">Player 2</h2>
                 <span id="p2Play"></span>
                 <img id="player2" class="player">
+            </div>
+        </div>
+    </div>
+    <div class="container" id="btnHolder">
+        <div class="row">
+            <div class="col-md-12" >
+                <button class="btn btn-block" id="newRound">Play</button>
+                <!-- <button class="btn" id="clearHistory">Clear</button> -->
+            </div>
+        </div>
+    </div>  
+    <div class="container" id="chat">
+        <div class="row">
+            <div class="col-12">
+                <p>Eventually there will be a chat feature here</p>
             </div>
         </div>
     </div>

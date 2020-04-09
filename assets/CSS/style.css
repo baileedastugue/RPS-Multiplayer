@@ -7,6 +7,12 @@ table {
     position: relative;
 }
 
+#sbTitle {
+    text-align: center;
+    color: #ffffff;
+    background-color: #65BA98;
+}
+
 .player[move="rock"] {
     content: url("../images/rock.png");
 }
@@ -34,7 +40,7 @@ img.player {
 }
 
 #scoreboard {
-    height: 400px;
+    height: 300px;
     overflow-x: scroll;
 }
 
