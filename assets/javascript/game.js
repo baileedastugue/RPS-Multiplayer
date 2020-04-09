@@ -36,20 +36,25 @@ var results = {
 }
 
 
+
 var currentPlayerName = "";
 
 function gatherUsers (){
     $(document).on("click", "#name-btn", function () {
         event.preventDefault();
         var userName = $("#userName").val();
-        if (!playerOne.present) {
+        if (!playerOne.present && !results.gameStarted) {
             database.ref("/players/playerOne/name").set(userName);
             database.ref("/players/playerOne/present").set(true);
+            $("#p1name").html(playerOne.name);
+            $("#nameForm")[0].reset();
+                // "waiting on Player 2 to join!");
         }
-        else {
+        else if (!results.gameStarted){
             database.ref("/players/playerTwo/name").set(userName);
             database.ref("/players/playerTwo/present").set(true);
-            database.ref("/results/gameStarted").set(false);
+            $("#p2name").html(playerTwo.name);
+            database.ref("/results/gameStarted").set(true);
         }
     })
 }
@@ -58,6 +63,10 @@ function gatherUsers (){
 database.ref().child("/players/playerOne").set(playerOne);
 database.ref().child("/players/playerTwo").set(playerTwo);
 database.ref().child("/results/").set(results);
+
+
+
+
 
 // retrivieving data from the database
 database.ref("/players/playerOne/recentPlay/").on("value", function(snapshot) {
@@ -97,6 +106,9 @@ database.ref("/results/numTies").on("value", function(snapshot) {
 })
 database.ref("/results/announce").on("value", function(snapshot) {
     results.announce = snapshot.val();
+})
+database.ref("/results/gameStarted").on("value", function(snapshot) {
+    results.gameStarted = snapshot.val();
 })
 
 gatherUsers();

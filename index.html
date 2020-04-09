@@ -33,7 +33,7 @@
     <div class="container">
         <div class="row">
             <div class="col-12">
-                <form>
+                <form id="nameForm">
                     <div class="form-group">
                         <label for="userName">Input Name</label>
                         <input type="text" class="form-control" id="userName">
@@ -64,7 +64,7 @@
         <!-- holds whether p1 or p2 have picked R, P, S -->
         <div class="row">
             <div class="col-md-2" id="p1Container">
-                <h2>Player 1</h2>
+                <h2 id="p1name">Player 1</h2>
                 <span id="p1Play">Choose your move</span>
                 <img id="player1" class="player">
             </div>
@@ -85,7 +85,7 @@
             </div>
 
             <div class="col-md-2" id="p2Container">
-               <h2>Player 2</h2>
+               <h2 id="p2name">Player 2</h2>
                 <span id="p2Play"></span>
                 <img id="player2" class="player">
             </div>
