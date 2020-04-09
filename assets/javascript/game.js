@@ -34,29 +34,49 @@ var results = {
     announce: "",
 }
 
-
+var playerOnePresent = false;
+var playerTwoPresent = false;
 var currentPlayerName = "";
 
+function gatherUsers (){
+    $(document).on("click", "#name-btn", function () {
+        var userName = $("#userName").val();
+        if (!playerOnePresent) {
+            database.ref("/players/playerOne/name").set(userName);
+            playerOnePresent = true;
+            event.preventDefault();
+        }
+        else {
+            database.ref("/players/playerTwo/name").set(userName);
+            event.preventDefault();
+        }
+    })
+}
+
+// setting up database skeleton of information
 database.ref().child("/players/playerOne").set(playerOne);
 database.ref().child("/players/playerTwo").set(playerTwo);
 database.ref().child("/results/").set(results);
 
+// retrivieving data from the database
 database.ref("/players/playerOne/recentPlay/").on("value", function(snapshot) {
     playerOne.recentPlay = snapshot.val();
 })
-
 database.ref("/players/playerTwo/recentPlay/").on("value", function(snapshot) {
     playerTwo.recentPlay = snapshot.val();
 })
-
+database.ref("/players/playerOne/name/").on("value", function(snapshot) {
+    playerOne.name = snapshot.val();
+})
+database.ref("/players/playerTwo/name/").on("value", function(snapshot) {
+    playerTwo.name = snapshot.val();
+})
 database.ref("/players/playerOne/turn/").on("value", function(snapshot) {
     playerOne.turn = snapshot.val();
 })
-
 database.ref("/players/playerTwo/turn/").on("value", function(snapshot) {
     playerTwo.turn = snapshot.val();
 })
-
 database.ref("/players/playerOne/numWins/").on("value", function(snapshot) {
     playerOne.numWins = snapshot.val();
 })
@@ -70,7 +90,9 @@ database.ref("/results/announce").on("value", function(snapshot) {
     results.announce = snapshot.val();
 })
 
+gatherUsers();
 
+// storing user inputs and pushing them to the database
 $(document).keyup(function (event) {
     var recentMove = event.key;
     if (recentMove === "r" || recentMove === "p" || recentMove === "s") {
@@ -88,11 +110,6 @@ $(document).keyup(function (event) {
         }
     }
 });
-
-$(document).on("click", "#name-btn", function () {
-    console.log($("#userName").val());
-    event.preventDefault();
-})
 
 // determines whether there has been a tie or which player won
 function determineResults () {
@@ -125,8 +142,8 @@ function determineResults () {
     displayResults();
 }
 
+// adding results to the scoreboard
 function displayResults () {    
-    
     var newRow = $("<tr>").append (
         $("<td>").text(results.numRounds),
         $("<td>").text(results.announce),
@@ -160,11 +177,6 @@ $("#clearHistory").on("click", function() {
     clearHist();
     $("#clearHistory").hide();
 })
-
-$("#newGame").on("click", function() {
-    clearHist();
-})
-
 
 function clearHist () {
     database.ref().remove();
