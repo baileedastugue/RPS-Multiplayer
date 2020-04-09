@@ -18,37 +18,38 @@ var playerOne = {
     name: "",
     recentPlay: "",
     numWins: 0,
-    turn: true
+    present: false
 }
 
 var playerTwo = {
     name: "",
     recentPlay: "",
     numWins: 0,
-    turn: false
+    present: false
 }
 
 var results = {
     numRounds: 1,
     numTies: 0,
     announce: "",
+    gameStarted: false
 }
 
-var playerOnePresent = false;
-var playerTwoPresent = false;
+
 var currentPlayerName = "";
 
 function gatherUsers (){
     $(document).on("click", "#name-btn", function () {
+        event.preventDefault();
         var userName = $("#userName").val();
-        if (!playerOnePresent) {
+        if (!playerOne.present) {
             database.ref("/players/playerOne/name").set(userName);
-            playerOnePresent = true;
-            event.preventDefault();
+            database.ref("/players/playerOne/present").set(true);
         }
         else {
             database.ref("/players/playerTwo/name").set(userName);
-            event.preventDefault();
+            database.ref("/players/playerTwo/present").set(true);
+            database.ref("/results/gameStarted").set(false);
         }
     })
 }
@@ -70,6 +71,14 @@ database.ref("/players/playerOne/name/").on("value", function(snapshot) {
 })
 database.ref("/players/playerTwo/name/").on("value", function(snapshot) {
     playerTwo.name = snapshot.val();
+})
+database.ref("/players/playerOne/present/").on("value", function(snapshot) {
+    playerOne.present = snapshot.val();
+    console.log("p1 present");
+})
+database.ref("/players/playerTwo/present/").on("value", function(snapshot) {
+    playerTwo.present = snapshot.val();
+    console.log("p2 present");
 })
 database.ref("/players/playerOne/turn/").on("value", function(snapshot) {
     playerOne.turn = snapshot.val();
