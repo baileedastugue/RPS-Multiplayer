@@ -29,7 +29,7 @@ var playerTwo = {
 }
 
 var results = {
-    numRounds: 1,
+    numRounds: 0,
     numTies: 0,
     announce: "",
     gameStarted: false
@@ -108,6 +108,9 @@ database.ref("/players/playerTwo/numWins/").on("value", function(snapshot) {
 database.ref("/results/numTies").on("value", function(snapshot) {
     results.numTies = snapshot.val();
 })
+database.ref("/results/numRounds").on("value", function(snapshot) {
+    results.numRounds = snapshot.val();
+})
 database.ref("/results/announce").on("value", function(snapshot) {
     results.announce = snapshot.val();
 })
@@ -165,7 +168,7 @@ function determineResults () {
         var outcome = "tie";
         var ties = results.numTies +1;
         database.ref().child("/results/announce").set(outcome); 
-        // database.ref().child("results/numTies").set(ties);
+        database.ref().child("results/numTies").set(ties);
         console.log(ties); 
     }
     // determines if player two wins
@@ -208,6 +211,8 @@ function newRound (){
 
 $("#newRound").on("click", function() {
     if (results.gameStarted) {
+        var rounds = results.numRounds +1;
+        database.ref().child("/results/numRounds").set(rounds); 
         newRound();
         $("#newRound").hide();
         $("#clearHistory").hide();
