@@ -89,6 +89,11 @@ $(document).keyup(function (event) {
     }
 });
 
+$(document).on("click", "#name-btn", function () {
+    console.log($("#userName").val());
+    event.preventDefault();
+})
+
 // determines whether there has been a tie or which player won
 function determineResults () {
     // determines whether player one wins
